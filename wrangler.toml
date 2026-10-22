@@ -1,4 +1,4 @@
-name = "switch-control"
+name = "mahway-switch"
 main = "src/worker.js"
 compatibility_date = "2025-01-01"
 
@@ -24,11 +24,11 @@ new_sqlite_classes = ["Scheduler"]
 # بيخزن الجداول والمؤقتات والسجل
 [[kv_namespaces]]
 binding = "KV"
-id = "حط_ID_بتاع_KV_هنا"
+id = "a36914b2496643c6a6df379fe9ebb0c3"
 
 [vars]
 # إيميلك (مطلوب لخدمة الإشعارات، مش بيتبعتله حاجة)
-VAPID_SUBJECT = "mailto:you@example.com"
+VAPID_SUBJECT = "mailto:mm284817@gmail.com"
 # حسب منطقة مشروع Tuya:
 # اوروبا https://openapi.tuyaeu.com | امريكا https://openapi.tuyaus.com
 # الهند https://openapi.tuyain.com | الصين https://openapi.tuyacn.com

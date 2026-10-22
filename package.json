@@ -1,0 +1,19 @@
+{
+  "name": "switch-control",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "login": "wrangler login",
+    "kv:create": "wrangler kv namespace create KV",
+    "secrets": "wrangler secret put TUYA_ACCESS_ID && wrangler secret put TUYA_ACCESS_KEY && wrangler secret put ACCESS_CODE && wrangler secret put SESSION_SECRET",
+    "secret:vapid": "wrangler secret put VAPID_PRIVATE_JWK",
+    "logs": "wrangler tail",
+    "vapid": "node generate-vapid.mjs"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  }
+}

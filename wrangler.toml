@@ -1,0 +1,37 @@
+name = "switch-control"
+main = "src/worker.js"
+compatibility_date = "2025-01-01"
+
+# الصفحة بتتحمل كنص جوه الـ worker
+[[rules]]
+type = "Text"
+globs = ["**/*.html"]
+fallthrough = true
+
+# شبكة أمان كل دقيقة + فحص النت (التنفيذ نفسه بيتم بالثانية عن طريق الـ Durable Object تحت)
+[triggers]
+crons = ["* * * * *"]
+
+# بيصحى في ثانية المؤقت/الجدول بالظبط
+[[durable_objects.bindings]]
+name = "SCHED"
+class_name = "Scheduler"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Scheduler"]
+
+# بيخزن الجداول والمؤقتات والسجل
+[[kv_namespaces]]
+binding = "KV"
+id = "حط_ID_بتاع_KV_هنا"
+
+[vars]
+# إيميلك (مطلوب لخدمة الإشعارات، مش بيتبعتله حاجة)
+VAPID_SUBJECT = "mailto:you@example.com"
+# حسب منطقة مشروع Tuya:
+# اوروبا https://openapi.tuyaeu.com | امريكا https://openapi.tuyaus.com
+# الهند https://openapi.tuyain.com | الصين https://openapi.tuyacn.com
+TUYA_ENDPOINT = "https://openapi.tuyaeu.com"
+# اختياري: لو عايز تحدد اجهزة معينة بدل ما يجيبهم كلهم من الحساب
+# TUYA_DEVICE_IDS = "id1,id2"

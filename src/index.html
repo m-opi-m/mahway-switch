@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#14181d" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#eef1f4" media="(prefers-color-scheme: light)">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<title>سويتش</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap">
+<style>
+:root{
+  color-scheme:dark light;
+  --bg:#14181d; --panel:#1d232a; --panel2:#262e37; --line:#2c343d;
+  --text:#e8edf2; --muted:#8a96a3; --on:#ffc247; --on-ink:#2a2008; --accent-text:#ffc247;
+  --glow:rgba(255,194,71,.32); --err:#ff7a6b; --ok:#6fd39a;
+  --toast-bg:#3a1f1c; --toast-text:#ffd9d4; --nav-bg:rgba(20,24,29,.94); --inset:rgba(0,0,0,.35);
+}
+@media (prefers-color-scheme: light){
+  :root{
+    --bg:#eef1f4; --panel:#ffffff; --panel2:#e7ecf0; --line:#d3dae1;
+    --text:#1b2128; --muted:#5b6977; --on:#ffb020; --on-ink:#2a2008; --accent-text:#8f5600;
+    --glow:rgba(255,176,32,.38); --err:#c4372a; --ok:#1f8f55;
+    --toast-bg:#fde7e4; --toast-text:#7a1f16; --nav-bg:rgba(238,241,244,.94); --inset:rgba(0,0,0,.08);
+  }
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--text);font-family:"Cairo",system-ui,sans-serif;line-height:1.5}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--accent-text);outline-offset:3px}
+.wrap{max-width:520px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 16px) 16px calc(env(safe-area-inset-bottom) + 96px)}
+h2{font-size:1.15rem;margin:8px 0 14px}
+h3{font-size:1rem;margin:22px 0 10px;color:var(--muted);font-weight:700}
+.toast{position:fixed;top:calc(env(safe-area-inset-top) + 10px);left:50%;transform:translateX(-50%);z-index:20;
+  background:var(--toast-bg);border:1px solid var(--err);color:var(--toast-text);padding:10px 16px;border-radius:12px;max-width:92vw;font-size:.95rem}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px;transition:border-color .3s,box-shadow .3s}
+.card.on{border-color:var(--on);box-shadow:0 0 36px -8px var(--glow)}
+.row{display:flex;align-items:center;gap:14px}
+.grow{flex:1;min-width:0}
+.name{font-weight:700;font-size:1.1rem;overflow-wrap:anywhere}
+.sub{color:var(--muted);font-size:.88rem}
+.sub.live::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ok);margin-inline-end:6px}
+.sub.dead::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--err);margin-inline-end:6px}
+.power{width:84px;height:84px;border-radius:50%;border:2px solid var(--line);background:var(--panel2);color:var(--muted);
+  display:grid;place-items:center;flex:none;transition:all .3s;box-shadow:inset 0 -6px 14px var(--inset)}
+.power svg{width:40%;height:40%;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round}
+.card.on .power{background:var(--on);border-color:var(--on);color:var(--on-ink);box-shadow:0 0 34px 4px var(--glow)}
+.power:active{transform:scale(.94)}
+.power[disabled]{opacity:.55;cursor:wait}
+.chip,.ghost{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:8px 14px;font-size:.92rem}
+.chip.sel{background:var(--on);color:var(--on-ink);border-color:var(--on);font-weight:700}
+.ghost{background:none;color:var(--muted)}
+.ghost.danger{color:var(--err)}
+.primary{background:var(--on);color:var(--on-ink);border:0;border-radius:12px;padding:12px 18px;font-weight:900;width:100%}
+.primary[disabled]{opacity:.5}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.timer-line{margin-top:12px;padding-top:12px;border-top:1px solid var(--line);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.count{font-variant-numeric:tabular-nums;color:var(--accent-text);font-weight:700}
+.sheet{margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.field label,.field .lab{color:var(--muted);font-size:.9rem}
+input[type=number],input[type=time],input[type=password],select{
+  background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%}
+.seg{display:flex;gap:8px}.seg .chip{flex:1;text-align:center}
+.item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.item:last-child{border-bottom:0}
+.time{font-size:1.5rem;font-weight:900;font-variant-numeric:tabular-nums}
+.toggle{width:50px;height:30px;border-radius:15px;border:1px solid var(--line);background:var(--panel2);position:relative;flex:none;transition:background .2s}
+.toggle::after{content:"";position:absolute;top:3px;inset-inline-start:3px;width:22px;height:22px;border-radius:50%;background:var(--muted);transition:all .2s}
+.toggle[aria-checked=true]{background:var(--on);border-color:var(--on)}
+.toggle[aria-checked=true]::after{inset-inline-start:23px;background:var(--on-ink)}
+.empty{color:var(--muted);text-align:center;padding:26px 8px}
+.hist{font-size:.92rem}
+.hist .t{color:var(--muted);font-size:.8rem}
+.hist .bad{color:var(--err)}
+nav{position:fixed;bottom:0;left:0;right:0;background:var(--nav-bg);backdrop-filter:blur(10px);border-top:1px solid var(--line);
+  display:flex;justify-content:center;padding-bottom:env(safe-area-inset-bottom)}
+nav .in{display:flex;width:100%;max-width:520px}
+nav button{flex:1;background:none;border:0;padding:12px 4px;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:2px;font-size:.82rem}
+nav button.sel{color:var(--accent-text);font-weight:700}
+nav svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.login{min-height:100vh;display:flex;flex-direction:column;justify-content:center;gap:14px;max-width:340px;margin:0 auto;padding:20px;text-align:center}
+.login h1{font-size:1.2rem;color:var(--muted);margin:0 0 6px}
+.login input{text-align:center;font-size:1.3rem;letter-spacing:.2em;padding:14px}
+.err{min-height:1.4rem;color:var(--err);font-size:.95rem}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const DAYS = {0:"أحد",1:"اتنين",2:"تلات",3:"أربع",4:"خميس",5:"جمعة",6:"سبت"};
+const DAY_ORDER = [6,0,1,2,3,4,5];
+const SRC = {manual:"يدوي", schedule:"جدول", timer:"مؤقت"};
+const state = {authed:null, tab:"home", channels:[], schedules:[], timers:[], error:null,
+  history:null, push:null, msg:"", sheetKey:null, formOpen:false, pending:new Set(),
+  form:{key:"", time:"07:00", days:[0,1,2,3,4,5,6], on:true}, timerForm:{minutes:30, on:false}};
+
+const $app = document.getElementById("app");
+function h(tag, props, ...kids){
+  const el = document.createElement(tag);
+  for(const [k,v] of Object.entries(props||{})){
+    if(k==="class") el.className=v;
+    else if(k.startsWith("on")) el.addEventListener(k.slice(2), v);
+    else if(k==="value"||k==="checked"||k==="disabled") el[k]=v;
+    else el.setAttribute(k,v);
+  }
+  for(const kid of kids.flat(Infinity)) if(kid!=null && kid!==false) el.append(kid.nodeType ? kid : document.createTextNode(kid));
+  return el;
+}
+const svg = (d) => { const s = document.createElementNS("http://www.w3.org/2000/svg","svg"); s.setAttribute("viewBox","0 0 24 24"); s.innerHTML = d; return s; };
+const ICONS = {
+  power:'<path d="M12 3v9"/><path d="M6.3 6.8a8 8 0 1 0 11.4 0"/>',
+  home:'<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/>',
+  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  gear:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>'
+};
+
+async function call(path, method="GET", body){
+  const r = await fetch(path, {method, headers: body ? {"Content-Type":"application/json"} : {}, body: body ? JSON.stringify(body) : undefined});
+  if(r.status===401 && path!=="/api/login"){ state.authed=false; render(); throw new Error("اتفصلت، ادخل الكود تاني"); }
+  const d = await r.json().catch(()=>({}));
+  if(!r.ok) throw new Error(d.error || "حصلت مشكلة");
+  return d;
+}
+let toastTimer;
+function toast(msg){ state.msg=msg; render(); clearTimeout(toastTimer); toastTimer=setTimeout(()=>{state.msg=""; render();},4500); }
+
+async function load(){
+  try{
+    const d = await call("/api/overview");
+    Object.assign(state, {channels:d.channels, schedules:d.schedules, timers:d.timers, error:d.error, authed:true});
+    if(!state.form.key && d.channels[0]) state.form.key = d.channels[0].key;
+  }catch(e){ if(state.authed===null) state.authed=false; }
+  if(!state.formOpen && !state.sheetKey) render();
+}
+const busy = () => state.formOpen || state.sheetKey;
+
+/* ---------- الدخول ---------- */
+function loginView(){
+  const msg = h("div",{class:"err",role:"alert"});
+  const input = h("input",{type:"password",id:"code",autocomplete:"current-password",placeholder:"الكود",required:"",inputmode:"numeric"});
+  return h("form",{class:"login",onsubmit: async (e)=>{
+    e.preventDefault(); msg.textContent="";
+    try{ await call("/api/login","POST",{code:input.value}); state.authed=true; await load(); }
+    catch(err){ msg.textContent=err.message; }
+  }},
+    h("h1",null,"ادخل الكود"), input,
+    h("button",{class:"primary",type:"submit"},"دخول"), msg);
+}
+
+/* ---------- الرئيسية ---------- */
+async function setPower(ch, on){
+  state.pending.add(ch.key); const prev = ch.on; ch.on = on; render();
+  try{ await call("/api/set","POST",{key:ch.key,name:ch.name,on}); }
+  catch(e){ ch.on = prev; toast(e.message); }
+  state.pending.delete(ch.key); render();
+}
+function fmtCount(ms){
+  const s = Math.max(0, Math.round(ms/1000)); const m = Math.floor(s/60);
+  return `${m}:${String(s%60).padStart(2,"0")}`;
+}
+function channelCard(ch){
+  const timer = state.timers.find(t=>t.key===ch.key);
+  const card = h("div",{class:"card"+(ch.on?" on":"")},
+    h("div",{class:"row"},
+      h("div",{class:"grow"}, h("div",{class:"name"},ch.name), h("div",{class:"sub "+(ch.online?"live":"dead")}, ch.online?"متصل":"مش متصل")),
+      h("button",{class:"power","aria-label":(ch.on?"اطفي ":"شغّل ")+ch.name,"aria-pressed":String(ch.on),disabled:state.pending.has(ch.key),onclick:()=>setPower(ch,!ch.on)}, svg(ICONS.power))));
+  if(timer){
+    card.append(h("div",{class:"timer-line"},
+      h("span",null,(timer.on?"هيشغّل":"هيطفي")+" بعد "), h("span",{class:"count","data-at":timer.at}, fmtCount(timer.at-Date.now())),
+      h("span",{class:"grow"}),
+      h("button",{class:"ghost danger",onclick: async()=>{ try{ await call("/api/timers/"+timer.id,"DELETE"); await load(); }catch(e){toast(e.message);} }},"إلغاء")));
+  } else if(state.sheetKey===ch.key){
+    const f = state.timerForm; if(f.autoFor!==ch.key){ f.on=!ch.on; f.autoFor=ch.key; }
+    const num = h("input",{type:"number",min:"1",max:"1440",value:String(f.minutes),"aria-label":"عدد الدقايق",oninput:(e)=>{f.minutes=Number(e.target.value);}});
+    const chips = h("div",{class:"chips"}, [15,30,60,120].map(m=>h("button",{class:"chip",type:"button",onclick:()=>{f.minutes=m;num.value=String(m);}}, m<60? m+" دقيقة" : (m/60)+" ساعة")));
+    const seg = h("div",{class:"seg"},
+      h("button",{class:"chip"+(!f.on?" sel":""),type:"button",onclick:()=>{f.on=false;render();}},"اطفي بعد"),
+      h("button",{class:"chip"+(f.on?" sel":""),type:"button",onclick:()=>{f.on=true;render();}},"شغّل بعد"));
+    card.append(h("div",{class:"sheet"}, seg, chips,
+      h("div",{class:"field"}, h("label",null,"المدة بالدقايق"), num),
+      h("div",{class:"row"},
+        h("button",{class:"primary",onclick: async()=>{
+          try{ await call("/api/timers","POST",{key:ch.key,name:ch.name,minutes:f.minutes,on:f.on}); state.sheetKey=null; await load(); }
+          catch(e){toast(e.message);} }},"ابدأ المؤقت"),
+        h("button",{class:"ghost",onclick:()=>{state.sheetKey=null;render();}},"إغلاق"))));
+  } else {
+    card.append(h("div",{class:"timer-line"}, h("button",{class:"ghost",onclick:()=>{state.sheetKey=ch.key;render();}},"مؤقت")));
+  }
+  return card;
+}
+function homeView(){
+  const out = [h("h2",null,"الأجهزة")];
+  if(state.error) out.push(h("div",{class:"card"}, h("div",{class:"name"},"مقدرتش اوصل لـ Tuya"), h("div",{class:"sub"},state.error)));
+  else if(!state.channels.length) out.push(h("div",{class:"empty"},"مفيش سويتشات ظاهرة في الحساب"));
+  state.channels.forEach(c=>out.push(channelCard(c)));
+  return out;
+}
+
+/* ---------- الجدولة ---------- */
+function daysLabel(days){
+  if(days.length===7) return "كل يوم";
+  return DAY_ORDER.filter(d=>days.includes(d)).map(d=>DAYS[d]).join("، ");
+}
+function scheduleView(){
+  const out = [h("h2",null,"الجدولة")];
+  if(!state.schedules.length) out.push(h("div",{class:"empty"},"مفيش جداول لسه"));
+  else out.push(h("div",{class:"card"}, state.schedules.map(s=>
+    h("div",{class:"item"},
+      h("div",{class:"grow"},
+        h("div",{class:"time"},s.time),
+        h("div",{class:"sub"},(s.on?"تشغيل":"إطفاء")+" · "+(s.name||s.key)),
+        h("div",{class:"sub"},daysLabel(s.days))),
+      h("button",{class:"toggle",role:"switch","aria-checked":String(s.enabled),"aria-label":"تفعيل الجدول",onclick: async()=>{ try{ await call(`/api/schedules/${s.id}/toggle`,"POST",{}); await load(); }catch(e){toast(e.message);} }}),
+      h("button",{class:"ghost danger","aria-label":"حذف الجدول",onclick: async()=>{ try{ await call("/api/schedules/"+s.id,"DELETE"); await load(); }catch(e){toast(e.message);} }},"حذف")))));
+  if(!state.formOpen){
+    out.push(h("button",{class:"primary",disabled:!state.channels.length,onclick:()=>{state.formOpen=true;render();}},"+ جدول جديد"));
+    return out;
+  }
+  const f = state.form;
+  const sel = h("select",{id:"f-key",onchange:(e)=>{f.key=e.target.value;}}, state.channels.map(c=>h("option",{value:c.key},c.name)));
+  sel.value = f.key;
+  out.push(h("div",{class:"card"},
+    h("div",{class:"field"}, h("label",{for:"f-key"},"السويتش"), sel),
+    h("div",{class:"field"}, h("label",{for:"f-time"},"الساعة (بتوقيت القاهرة)"), h("input",{type:"time",id:"f-time",value:f.time,onchange:(e)=>{f.time=e.target.value;}})),
+    h("div",{class:"field"}, h("span",{class:"lab"},"الأيام"),
+      h("div",{class:"chips"}, DAY_ORDER.map(d=>h("button",{class:"chip"+(f.days.includes(d)?" sel":""),type:"button","aria-pressed":String(f.days.includes(d)),onclick:()=>{
+        f.days = f.days.includes(d) ? f.days.filter(x=>x!==d) : [...f.days,d]; render(); }},DAYS[d])))),
+    h("div",{class:"field"}, h("span",{class:"lab"},"يعمل إيه"),
+      h("div",{class:"seg"},
+        h("button",{class:"chip"+(f.on?" sel":""),type:"button",onclick:()=>{f.on=true;render();}},"تشغيل"),
+        h("button",{class:"chip"+(!f.on?" sel":""),type:"button",onclick:()=>{f.on=false;render();}},"إطفاء"))),
+    h("div",{class:"row"},
+      h("button",{class:"primary",onclick: async()=>{
+        const ch = state.channels.find(c=>c.key===f.key);
+        try{ await call("/api/schedules","POST",{key:f.key,name:ch?ch.name:"",time:f.time,days:f.days,on:f.on}); state.formOpen=false; await load(); }
+        catch(e){toast(e.message);} }},"حفظ الجدول"),
+      h("button",{class:"ghost",onclick:()=>{state.formOpen=false;render();}},"إلغاء"))));
+  return out;
+}
+
+/* ---------- الإشعارات ---------- */
+const pushSupported = "serviceWorker" in navigator && "PushManager" in window && "Notification" in window;
+if("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js").catch(()=>{});
+const b64uToBytes = (s)=>{ s=s.replace(/-/g,"+").replace(/_/g,"/"); return Uint8Array.from(atob(s+"=".repeat((4-s.length%4)%4)), c=>c.charCodeAt(0)); };
+async function loadPush(){
+  state.push = "loading";
+  if(!pushSupported) state.push = "unsupported";
+  else if(Notification.permission==="denied") state.push = "denied";
+  else { try{ const reg = await navigator.serviceWorker.ready; state.push = (await reg.pushManager.getSubscription()) ? "on" : "off"; }catch(e){ state.push = "off"; } }
+  render();
+}
+async function enablePush(){
+  try{
+    if(await Notification.requestPermission()!=="granted") throw new Error("لازم تسمح بالإشعارات من إعدادات المتصفح");
+    const {key} = await call("/api/push/key");
+    const reg = await navigator.serviceWorker.ready;
+    const old = await reg.pushManager.getSubscription(); if(old) await old.unsubscribe();
+    const sub = await reg.pushManager.subscribe({userVisibleOnly:true, applicationServerKey:b64uToBytes(key)});
+    await call("/api/push/subscribe","POST",{subscription:sub.toJSON()});
+    state.push = "on"; render();
+  }catch(e){ toast(e.message); loadPush(); }
+}
+async function disablePush(){
+  try{
+    const reg = await navigator.serviceWorker.ready; const sub = await reg.pushManager.getSubscription();
+    if(sub){ await call("/api/push/unsubscribe","POST",{endpoint:sub.endpoint}); await sub.unsubscribe(); }
+    state.push = "off"; render();
+  }catch(e){ toast(e.message); }
+}
+function pushCard(){
+  if(state.push===null) loadPush();
+  const P = state.push;
+  const text = {
+    loading:"...",
+    unsupported:"المتصفح ده مش بيدعم الإشعارات. على الآيفون لازم تضيف التطبيق على الشاشة الرئيسية الأول.",
+    denied:"الإشعارات متقفلة للموقع ده من إعدادات المتصفح، افتحها من هناك الأول.",
+    off:"هتوصلك إشعارات لما جدول أو مؤقت يتنفذ، ولما سويتش يفصل من النت.",
+    on:"الإشعارات شغالة على الجهاز ده."
+  }[P] || "";
+  return h("div",{class:"card"},
+    h("div",{class:"sub"},text),
+    P==="off" ? h("div",{class:"timer-line"}, h("button",{class:"primary",onclick:enablePush},"فعّل الإشعارات")) : null,
+    P==="on" ? h("div",{class:"timer-line"},
+      h("button",{class:"ghost",onclick: async()=>{ try{ await call("/api/push/test","POST",{}); }catch(e){toast(e.message);} }},"جرّب إشعار"),
+      h("button",{class:"ghost danger",onclick:disablePush},"اقفل الإشعارات")) : null);
+}
+
+/* ---------- الإعدادات ---------- */
+async function loadHistory(){
+  try{ state.history = await call("/api/history"); render(); }catch(e){ toast(e.message); }
+}
+function settingsView(){
+  if(state.history===null) loadHistory();
+  const fmt = (t)=>new Date(t).toLocaleString("ar-EG",{timeZone:"Africa/Cairo",dateStyle:"short",timeStyle:"short"});
+  const hist = state.history;
+  return [
+    h("h2",null,"الإعدادات"),
+    h("h3",null,"الإشعارات"),
+    pushCard(),
+    h("h3",null,"سجل النشاط"),
+    h("div",{class:"card hist"},
+      hist===null ? h("div",{class:"empty"},"بيحمّل...") :
+      !hist.length ? h("div",{class:"empty"},"السجل فاضي") :
+      hist.map(x=>h("div",{class:"item"},
+        h("div",{class:"grow"},
+          h("div",{class:x.ok?"":"bad"}, (x.ok?"":"فشل: ")+(x.on?"تشغيل":"إطفاء")+" · "+x.name),
+          h("div",{class:"t"},fmt(x.t)+" · "+(SRC[x.src]||x.src)+(x.ok?"":" · "+(x.err||"")))))),
+      hist && hist.length ? h("button",{class:"ghost danger",onclick: async()=>{ try{ await call("/api/history","DELETE"); state.history=[]; render(); }catch(e){toast(e.message);} }},"مسح السجل") : null),
+    h("h3",null,"الحساب"),
+    h("button",{class:"ghost",onclick: async()=>{ try{ await call("/api/logout","POST",{}); }catch(e){} state.authed=false; state.history=null; render(); }},"تسجيل خروج"),
+    h("p",{class:"sub"},"الجداول والمؤقتات بتتنفذ من السيرفر في ميعادها بالظبط حتى لو الموبايل مقفول.")
+  ];
+}
+
+/* ---------- الهيكل ---------- */
+function navBtn(id,label,icon){
+  return h("button",{class:state.tab===id?"sel":"","aria-current":state.tab===id?"page":"false",onclick:()=>{state.tab=id;state.sheetKey=null;state.formOpen=false;if(id==="settings")state.history=null;render();}}, svg(icon), label);
+}
+function render(){
+  const se = document.scrollingElement || document.documentElement;
+  const top = se.scrollTop;
+  $app.replaceChildren();
+  if(state.authed===null) return;
+  if(state.authed===false){ $app.append(loginView()); return; }
+  const view = state.tab==="home" ? homeView() : state.tab==="schedule" ? scheduleView() : settingsView();
+  $app.append(
+    state.msg ? h("div",{class:"toast",role:"alert"},state.msg) : null,
+    h("main",{class:"wrap"}, view),
+    h("nav",null, h("div",{class:"in"}, navBtn("home","الرئيسية",ICONS.home), navBtn("schedule","الجدولة",ICONS.clock), navBtn("settings","الإعدادات",ICONS.gear))));
+  se.scrollTop = top;
+}
+
+setInterval(()=>{
+  document.querySelectorAll("[data-at]").forEach(el=>{
+    const left = Number(el.dataset.at)-Date.now();
+    el.textContent = fmtCount(left);
+    if(left<=-3000 && !busy()) load();
+  });
+}, 1000);
+setInterval(()=>{ if(!document.hidden && state.authed && !busy() && state.tab!=="settings") load(); }, 20000);
+document.addEventListener("visibilitychange", ()=>{ if(!document.hidden && state.authed && !busy()) load(); });
+load();
+</script>
+</body>
+</html>
